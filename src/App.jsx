@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
+import Filtros from "./components/Filtros";
 import Modal from "./components/Modal";
 import ListadoGastos from "./components/ListadoGastos";
 import { generarId } from "./helpers";
@@ -13,6 +14,8 @@ function App() {
   const [modal, setModal] = useState(false);
   const [animarModal, setAnimarModal] = useState(false);
   const [gastoEditar, setGastoEditar] = useState({});
+  const [filtro, setFiltro] = useState('');
+  const [gastosFiltrados, setGastosFiltrados] = useState([]);
 
   useEffect(() => {
     if(Object.keys(gastoEditar).length !== 0) {
@@ -24,11 +27,19 @@ function App() {
   }, [gastoEditar]);
 
   useEffect(() => {
+    if(filtro) {
+      //Filtrar gastos por categoria
+      const gastosFiltrados = gastos.filter(gasto => gasto.categoria === filtro);
+      setGastosFiltrados(gastosFiltrados);
+    }
+  }, [filtro])
+
+  useEffect(() => {
     const presupuestoLS = Number(localStorage.getItem('presupuesto'));
     if(presupuestoLS) {
       setIsvalidPresupuesto(true);
     }
-  }, [])
+  }, []);
   const handleNuevoGasto = () => {    
     setModal(true);
     setGastoEditar({});
@@ -73,7 +84,8 @@ function App() {
       {isValidPresupuesto && (
         <>
           <main>
-            <ListadoGastos gastos={gastos} setGastoEditar={setGastoEditar} eliminarGasto={eliminarGasto} />
+          <Filtros filtro={filtro} setFiltro={setFiltro}/>
+            <ListadoGastos gastos={gastos} filtro={filtro} gastosFiltrados={gastosFiltrados} setGastoEditar={setGastoEditar} eliminarGasto={eliminarGasto} />
           </main>
           <div className="nuevo-gasto">
             <img
