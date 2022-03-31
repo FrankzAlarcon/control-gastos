@@ -1,34 +1,68 @@
-import React from 'react'
-import CerrarBtn from '../img/cerrar.svg';
+import React, { useState } from "react";
+import Mensaje from './Mensaje';
+import CerrarBtn from "../img/cerrar.svg";
 
-function Modal({ setModal, animarModal, setAnimarModal }) {
-  const ocultarModal =() => {
+function Modal({ setModal, animarModal, setAnimarModal, guardarGasto }) {
+  const [mensaje, setMensaje] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [cantidad, setCatidad] = useState('');
+  const [categoria, setCategoria] = useState('');
+
+  const ocultarModal = () => {
     setAnimarModal(false);
     setTimeout(() => {
       setModal(false);
-    }, 400)
+    }, 400);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if([nombre, cantidad, categoria].includes('')){
+      setMensaje('Todos los campos son obligatorios');
+      setTimeout(() => {
+        setMensaje('')
+      }, 3000)
+    }
+    guardarGasto({nombre, cantidad, categoria})
   }
   return (
-    <div className='modal'>
+    <div className="modal">
       <div className="cerrar-modal">
         <img src={CerrarBtn} alt="icono cerrar modal" onClick={ocultarModal} />
       </div>
-      <form className={`formulario ${animarModal ? 'animar':'cerrar'}`}>
+      <form
+        className={`formulario ${animarModal ? "animar" : "cerrar"}`}
+        onSubmit={handleSubmit}
+      >
         <legend>Nuevo Gasto</legend>
+        {mensaje && <Mensaje tipo="error">{mensaje}</Mensaje>}
         <div className="campo">
           <label htmlFor="nombre">Nombre del Gasto</label>
-          <input id='nombre' type="text" placeholder='Añade el nombre del gasto' />
+          <input
+            id="nombre"
+            type="text"
+            placeholder="Añade el nombre del gasto"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+          />
         </div>
         <div className="campo">
           <label htmlFor="cantidad">Cantidad</label>
-          <input id='cantidad'  type="number" placeholder='Añade la cantidad del gasto: ej. 300' />
+          <input
+            id="cantidad"
+            type="number"
+            placeholder="Añade la cantidad del gasto: ej. 300"
+            value={cantidad}
+            onChange={(e) => setCatidad(Number(e.target.value))}
+          />
         </div>
         <div className="campo">
           <label htmlFor="categoria">Categoría</label>
-          <select name="categoria" id="categoria">
+          <select name="categoria" id="categoria" onChange={(e) => setCategoria(e.target.value)}>
             <option value="">-- Seleccione</option>
             <option value="ahorro">Ahorro</option>
             <option value="comida">Comida</option>
+            <option value="casa">Casa</option>
             <option value="gastos">Gastos Varios</option>
             <option value="ocio">Ocio</option>
             <option value="salud">Salud</option>
@@ -38,7 +72,7 @@ function Modal({ setModal, animarModal, setAnimarModal }) {
         <input type="submit" value="Añadir Gasto" />
       </form>
     </div>
-  )
+  );
 }
 
 export default Modal;
